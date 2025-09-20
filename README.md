@@ -39,10 +39,11 @@ pip install a-stock-mcp-server
 git clone https://github.com/Llldmiao/a-stock-mcp-server.git
 cd a-stock-mcp-server
 
-# 安装依赖
-pip install -r requirements.txt
+# 使用Poetry安装（推荐）
+poetry install
 
-# 开发模式安装
+# 或者使用pip安装
+pip install -r requirements.txt
 pip install -e .
 ```
 
@@ -72,7 +73,7 @@ python3 local_test.py
 
 ```python
 import asyncio
-from local_test import AStockLocalTest
+from a_stock_mcp_server.local_test import AStockLocalTest
 
 async def main():
     server = AStockLocalTest()
@@ -82,6 +83,24 @@ async def main():
     print(result)
 
 asyncio.run(main())
+```
+
+**输出示例：**
+```
+股票代码: 000001
+股票名称: 平安银行
+当前价格: ¥11.45
+涨跌额: +0.04
+涨跌幅: +0.35%
+成交量: 834,651.0
+成交额: ¥955,004,096.91
+最高价: ¥11.51
+最低价: ¥11.37
+开盘价: ¥11.41
+昨收价: ¥11.41
+换手率: 0.43%
+市盈率: 4.47
+市净率: 0.5
 ```
 
 ## 使用示例
@@ -119,6 +138,18 @@ asyncio.run(main())
   }
 }
 ```
+
+## 🔧 常用股票代码
+
+| 股票名称 | 代码 | 市场 |
+|---------|------|------|
+| 平安银行 | 000001 | 深市 |
+| 万科A | 000002 | 深市 |
+| 中国平安 | 601318 | 沪市 |
+| 招商银行 | 600036 | 沪市 |
+| 工商银行 | 601398 | 沪市 |
+| 建设银行 | 601939 | 沪市 |
+| 农业银行 | 601288 | 沪市 |
 
 ## 数据源
 
@@ -161,14 +192,67 @@ asyncio.run(main())
 ## 故障排除
 
 ### 常见问题
-1. **导入错误**: 确保安装了所有依赖包
-2. **网络超时**: 检查网络连接，可能需要代理
-3. **数据为空**: 检查股票代码格式是否正确
+
+#### 问题1: 导入错误
+```
+ModuleNotFoundError: No module named 'akshare'
+```
+**解决方案**: 安装AKShare
+```bash
+pip3 install akshare
+```
+
+#### 问题2: 网络超时
+```
+获取数据失败: timeout
+```
+**解决方案**: 检查网络连接，可能需要代理
+
+#### 问题3: 股票代码不存在
+```
+未找到股票代码: XXXXXX
+```
+**解决方案**: 检查股票代码格式，确保是6位数字
+
+#### 问题4: 数据为空
+**解决方案**: 检查股票代码格式是否正确
 
 ### 日志调试
 ```python
 import logging
 logging.basicConfig(level=logging.DEBUG)
+```
+
+## 📝 完整使用示例
+
+```python
+#!/usr/bin/env python3
+import asyncio
+from a_stock_mcp_server.local_test import AStockLocalTest
+
+async def main():
+    # 创建服务器实例
+    server = AStockLocalTest()
+    
+    # 查询平安银行实时价格
+    print("=== 平安银行实时价格 ===")
+    price = await server.call_tool("get_realtime_price", {"symbol": "000001"})
+    print(price)
+    
+    # 查询股票基本信息
+    print("\n=== 平安银行基本信息 ===")
+    info = await server.call_tool("get_stock_info", {"symbol": "000001"})
+    print(info)
+    
+    # 查询市场概况（只显示前10个）
+    print("\n=== 市场概况（前10个）===")
+    market = await server.call_tool("get_market_summary", {})
+    lines = market.split('\n')
+    for line in lines[:12]:  # 标题 + 前10个指数
+        print(line)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ## 贡献

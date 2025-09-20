@@ -2,10 +2,8 @@
   "mcpServers": {
     "a-stock-realtime": {
       "command": "python",
-      "args": ["/Users/lengmiao/Dev/financial-tools/a_stock_mcp_with_akshare.py"],
-      "env": {
-        "PYTHONPATH": "/Users/lengmiao/Dev/financial-tools"
-      }
+      "args": ["-m", "a_stock_mcp_server"],
+      "env": {}
     }
   }
 }
