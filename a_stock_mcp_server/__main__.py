@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
+from mcp.server.lowlevel.server import NotificationOptions
 from mcp.types import (
     CallToolRequest,
     CallToolResult,
@@ -301,6 +302,13 @@ async def main():
     """主函数"""
     app = AStockMCPServerWithAKShare()
     
+    # 创建通知选项
+    notification_options = NotificationOptions(
+        prompts_changed=False,
+        resources_changed=False,
+        tools_changed=False
+    )
+    
     # 使用stdio传输
     async with stdio_server() as (read_stream, write_stream):
         await app.server.run(
@@ -310,7 +318,7 @@ async def main():
                 server_name="a-stock-realtime-akshare",
                 server_version="1.0.0",
                 capabilities=app.server.get_capabilities(
-                    notification_options=None,
+                    notification_options=notification_options,
                     experimental_capabilities={}
                 )
             )

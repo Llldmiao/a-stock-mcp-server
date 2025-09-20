@@ -5,7 +5,7 @@ A股MCP服务器测试用例
 
 import pytest
 import asyncio
-from a_stock_mcp_with_akshare import AStockMCPServerWithAKShare
+from a_stock_mcp_server import AStockMCPServerWithAKShare
 
 class TestAStockMCPServer:
     """测试A股MCP服务器"""

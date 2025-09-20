@@ -17,5 +17,6 @@ __author__ = "Llldmiao"
 __email__ = "llldmiao@users.noreply.github.com"
 
 from .local_test import AStockLocalTest
+from .__main__ import AStockMCPServerWithAKShare
 
-__all__ = ["AStockLocalTest"]
+__all__ = ["AStockLocalTest", "AStockMCPServerWithAKShare"]
