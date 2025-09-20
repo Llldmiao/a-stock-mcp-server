@@ -14,8 +14,8 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="a-stock-mcp-server",
     version="1.0.0",
-    author="Financial Tools Developer",
-    author_email="financial-tools@example.com",
+    author="Llldmiao",
+    author_email="llldmiao@users.noreply.github.com",
     description="A股实时行情MCP服务器 - 基于Model Context Protocol的A股数据查询工具",
     long_description=long_description,
     long_description_content_type="text/markdown",

@@ -7,7 +7,7 @@ A股MCP服务器命令行工具
 import asyncio
 import argparse
 import sys
-from local_test import AStockLocalTest
+from .local_test import AStockLocalTest
 
 async def query_stock_price(symbol):
     """查询股票价格"""
