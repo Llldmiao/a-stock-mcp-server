@@ -118,3 +118,8 @@ Thumbs.db
 # MCP specific
 *.log
 config.local.json
+
+# GitHub Actions (keep these files)
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
