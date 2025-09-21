@@ -33,6 +33,7 @@ mcp = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
+pytest-asyncio = "^0.21.0"
 black = "^22.0.0"
 flake8 = "^5.0.0"
 mypy = "^1.0.0"
@@ -56,11 +57,16 @@ build-backend = "poetry.core.masonry.api"
 line-length = 88
 target-version = ['py38']
 
+[tool.flake8]
+max-line-length = 88
+ignore = ["E203", "W503"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+asyncio_mode = "auto"
 
 [tool.mypy]
 python_version = "3.8"
