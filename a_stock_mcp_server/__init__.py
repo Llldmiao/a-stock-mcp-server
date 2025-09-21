@@ -18,5 +18,6 @@ __email__ = "llldmiao@users.noreply.github.com"
 
 from .local_test import AStockLocalTest
 from .__main__ import AStockMCPServerWithAKShare
+from .base import AStockBase
 
-__all__ = ["AStockLocalTest", "AStockMCPServerWithAKShare"]
+__all__ = ["AStockLocalTest", "AStockMCPServerWithAKShare", "AStockBase"]

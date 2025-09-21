@@ -21,15 +21,21 @@ from mcp.types import (
     Tool,
     TextContent,
 )
+from .base import AStockBase
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class AStockMCPServerWithAKShare:
+class AStockMCPServerWithAKShare(AStockBase):
     def __init__(self):
+        super().__init__()
         self.server = Server("a-stock-realtime-akshare")
         self.setup_handlers()
+    
+    def format_result(self, data: Any, result_type: str = "text") -> List[TextContent]:
+        """格式化结果为MCP TextContent列表"""
+        return [TextContent(type="text", text=str(data))]
         
     def setup_handlers(self):
         """设置MCP处理器"""
@@ -146,6 +152,10 @@ class AStockMCPServerWithAKShare:
         """获取实时价格 - 使用AKShare"""
         symbol = args.get("symbol", "")
         
+        # 验证股票代码
+        if not self.validate_symbol(symbol):
+            return [TextContent(type="text", text=f"无效的股票代码格式: {symbol}，请使用6位数字代码")]
+        
         try:
             # 使用AKShare获取实时数据
             import akshare as ak
@@ -162,25 +172,28 @@ class AStockMCPServerWithAKShare:
             stock_info = stock_data.iloc[0]
             
             result = f"""
-股票代码: {stock_info['代码']}
-股票名称: {stock_info['名称']}
-当前价格: ¥{stock_info['最新价']}
-涨跌额: {stock_info['涨跌额']:+.2f}
-涨跌幅: {stock_info['涨跌幅']:+.2f}%
-成交量: {stock_info['成交量']:,}
-成交额: ¥{stock_info['成交额']:,}
-最高价: ¥{stock_info['最高']}
-最低价: ¥{stock_info['最低']}
-开盘价: ¥{stock_info['今开']}
-昨收价: ¥{stock_info['昨收']}
-换手率: {stock_info['换手率']:.2f}%
-市盈率: {stock_info['市盈率-动态']}
-市净率: {stock_info['市净率']}
-更新时间: {stock_info['时间']}
+股票代码: {self.safe_get_field(stock_info, '代码', symbol)}
+股票名称: {self.safe_get_field(stock_info, '名称', 'N/A')}
+当前价格: {self.format_price(self.safe_get_field(stock_info, '最新价'))}
+涨跌额: {self.safe_get_field(stock_info, '涨跌额', 0):+.2f}
+涨跌幅: {self.format_percentage(self.safe_get_field(stock_info, '涨跌幅'))}
+成交量: {self.format_number(self.safe_get_field(stock_info, '成交量'))}
+成交额: {self.format_price(self.safe_get_field(stock_info, '成交额'))}
+最高价: {self.format_price(self.safe_get_field(stock_info, '最高'))}
+最低价: {self.format_price(self.safe_get_field(stock_info, '最低'))}
+开盘价: {self.format_price(self.safe_get_field(stock_info, '今开'))}
+昨收价: {self.format_price(self.safe_get_field(stock_info, '昨收'))}
+换手率: {self.format_percentage(self.safe_get_field(stock_info, '换手率'))}
+市盈率: {self.safe_get_field(stock_info, '市盈率-动态', 'N/A')}
+市净率: {self.safe_get_field(stock_info, '市净率', 'N/A')}
+更新时间: {self.safe_get_field(stock_info, '时间', 'N/A')}
             """
             
             return [TextContent(type="text", text=result.strip())]
             
+        except ImportError as e:
+            logger.error(f"AKShare未安装: {e}")
+            return [TextContent(type="text", text="错误: AKShare未安装，请运行 pip install akshare")]
         except Exception as e:
             logger.error(f"获取实时价格失败: {e}")
             return [TextContent(type="text", text=f"获取数据失败: {str(e)}")]

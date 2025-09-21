@@ -3,7 +3,9 @@
     "a-stock-realtime": {
       "command": "python",
       "args": ["-m", "a_stock_mcp_server"],
-      "env": {}
+      "env": {
+        "PYTHONPATH": "."
+      }
     }
   }
 }

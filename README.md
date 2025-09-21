@@ -1,6 +1,6 @@
 # A股实时行情MCP服务器
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Protocol-green.svg)](https://modelcontextprotocol.io/)
 [![PyPI version](https://badge.fury.io/py/a-stock-mcp-server.svg)](https://badge.fury.io/py/a-stock-mcp-server)

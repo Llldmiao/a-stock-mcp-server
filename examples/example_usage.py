@@ -6,7 +6,7 @@ A股MCP服务器使用示例
 
 import asyncio
 import json
-from a_stock_mcp_with_akshare import AStockMCPServerWithAKShare
+from a_stock_mcp_server.__main__ import AStockMCPServerWithAKShare
 
 async def demo_usage():
     """演示MCP服务器的各种功能"""
