@@ -2,6 +2,7 @@
 include README.md
 include LICENSE
 include CHANGELOG.md
+include MCP_USAGE_GUIDE.md
 include requirements.txt
 include requirements-dev.txt
 include mcp_config.json

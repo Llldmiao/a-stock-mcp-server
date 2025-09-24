@@ -1,4 +1,4 @@
-# A股实时行情MCP服务器
+# A股实时行情MCP服务器 v2.0
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,7 +6,15 @@
 [![PyPI version](https://badge.fury.io/py/a-stock-mcp-server.svg)](https://badge.fury.io/py/a-stock-mcp-server)
 [![Downloads](https://pepy.tech/badge/a-stock-mcp-server)](https://pepy.tech/project/a-stock-mcp-server)
 
-这是一个基于Model Context Protocol (MCP) 的A股实时行情查询服务器，支持查询A股实时价格、历史数据、财务信息等。专为AI助手和金融分析工具设计。
+这是一个基于Model Context Protocol (MCP) 的A股实时行情查询服务器，采用多数据源架构，支持查询A股实时价格、历史数据、财务信息等。专为AI助手和金融分析工具设计。
+
+## 🚀 新版本特性 (v2.0)
+
+- **多数据源架构**: 支持故障转移和负载均衡
+- **模块化设计**: 工具和数据源完全解耦
+- **智能缓存**: 提高响应速度和减少API调用
+- **增强错误处理**: 完善的异常处理和重试机制
+- **完整测试覆盖**: 单元测试和集成测试
 
 ## 功能特性
 
@@ -47,6 +55,53 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+### 🤖 MCP服务器使用
+
+#### 快速配置
+在你的MCP客户端配置文件中添加：
+
+```json
+{
+  "mcpServers": {
+    "a-stock-realtime": {
+      "command": "python",
+      "args": ["-m", "a_stock_mcp_server"]
+    }
+  }
+}
+```
+
+#### 可用工具
+1. **get_realtime_price** - 获取实时价格
+   - 参数: `symbol` (股票代码，如"000001")
+2. **get_stock_info** - 获取股票基本信息
+   - 参数: `symbol` (股票代码)
+3. **get_market_summary** - 获取市场概况
+   - 参数: 无
+4. **get_stock_history** - 获取历史数据
+   - 参数: `symbol`, `period`(daily/weekly/monthly), `start_date`, `end_date`
+5. **get_financial_data** - 获取财务数据
+   - 参数: `symbol`, `report_type`(income/balance/cashflow)
+
+#### 使用示例
+```json
+// 查询平安银行实时价格
+{
+  "name": "get_realtime_price",
+  "arguments": {
+    "symbol": "000001"
+  }
+}
+
+// 查询市场概况
+{
+  "name": "get_market_summary",
+  "arguments": {}
+}
+```
+
+详细使用说明请参考 [MCP使用指南](MCP_USAGE_GUIDE.md)
+
 ### 🛠️ 命令行工具使用
 
 安装后可以使用命令行工具：
@@ -66,10 +121,38 @@ a-stock-cli market
 
 ```bash
 # 运行完整测试
+python3 -m pytest tests/ -v
+
+# 运行测试客户端
+python3 -m a_stock_mcp_server.test_client
+
+# 运行旧版测试（兼容性）
 python3 local_test.py
 ```
 
 ### 📚 Python代码使用
+
+#### 新版本 (推荐)
+
+```python
+import asyncio
+from a_stock_mcp_server.test_client import AStockTestClient
+
+async def main():
+    client = AStockTestClient()
+    
+    # 查询平安银行实时价格
+    result = await client.call_tool("get_realtime_price", {"symbol": "000001"})
+    print(result)
+    
+    # 健康检查
+    health = await client.health_check()
+    print("数据源状态:", health)
+
+asyncio.run(main())
+```
+
+#### 旧版本 (兼容性)
 
 ```python
 import asyncio
@@ -151,13 +234,54 @@ asyncio.run(main())
 | 建设银行 | 601939 | 沪市 |
 | 农业银行 | 601288 | 沪市 |
 
+## 架构设计
+
+### 多数据源架构
+
+```
+数据源层 (Data Sources)
+├── BaseDataSource (抽象基类)
+├── AKShareDataSource (AKShare实现)
+├── DataSourceManager (数据源管理器)
+└── CacheManager (缓存管理器)
+
+工具层 (Tools)
+├── BaseTool (工具基类)
+├── RealtimePriceTool (实时价格)
+├── StockInfoTool (股票信息)
+├── MarketSummaryTool (市场概况)
+├── StockHistoryTool (历史数据)
+└── FinancialDataTool (财务数据)
+
+服务器层 (Server)
+├── AStockMCPServer (主服务器)
+├── AStockMCPServerWithAKShare (兼容包装)
+└── AStockTestClient (测试客户端)
+```
+
+### 核心特性
+
+- **故障转移**: 自动切换到备用数据源
+- **智能缓存**: 减少API调用，提高响应速度
+- **模块化设计**: 易于扩展和维护
+- **完整测试**: 单元测试和集成测试覆盖
+
 ## 数据源
 
-本MCP服务器使用 [AKShare](https://github.com/akfamily/akshare) 作为数据源：
+本MCP服务器使用 [AKShare](https://github.com/akfamily/akshare) 作为主要数据源：
 - 免费、开源
 - 数据更新及时
 - 支持多种金融数据
 - 社区活跃
+
+### 扩展数据源
+
+架构支持添加新的数据源，如：
+- 新浪财经API
+- 腾讯财经API
+- 其他金融数据提供商
+
+详细扩展指南请参考 [架构文档](ARCHITECTURE.md)
 
 ## 扩展建议
 
