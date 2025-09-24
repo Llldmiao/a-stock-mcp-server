@@ -23,17 +23,17 @@ logger = logging.getLogger(__name__)
 
 class AStockTestClient:
     """A股测试客户端"""
-    
+
     def __init__(self):
         self.data_source_manager = DataSourceManager()
         self.tools = []
-        
+
         # 初始化数据源
         self._setup_data_sources()
-        
+
         # 初始化工具
         self._setup_tools()
-    
+
     def _setup_data_sources(self):
         """设置数据源"""
         # 创建AKShare数据源
@@ -43,14 +43,14 @@ class AStockTestClient:
             priority=1,
             timeout=30,
             retry_count=3,
-            cache_ttl=300
+            cache_ttl=300,
         )
-        
+
         akshare_source = AKShareDataSource(akshare_config)
         self.data_source_manager.register_source(akshare_source)
-        
+
         logger.info("数据源初始化完成")
-    
+
     def _setup_tools(self):
         """设置工具"""
         self.tools = [
@@ -60,9 +60,9 @@ class AStockTestClient:
             StockHistoryTool(self.data_source_manager),
             FinancialDataTool(self.data_source_manager),
         ]
-        
+
         logger.info(f"工具初始化完成，共{len(self.tools)}个工具")
-    
+
     async def call_tool(self, name: str, arguments: Dict[str, Any]) -> str:
         """调用工具"""
         try:
@@ -72,26 +72,26 @@ class AStockTestClient:
                 if t.tool_definition.name == name:
                     tool = t
                     break
-            
+
             if tool is None:
                 return f"未知工具: {name}"
-            
+
             # 执行工具
             result = await tool.execute(arguments)
             return result[0].text if result else "无结果"
-            
+
         except Exception as e:
             logger.error(f"工具调用错误: {e}")
             return f"错误: {str(e)}"
-    
+
     def list_tools(self):
         """列出可用工具"""
         return [tool.tool_definition for tool in self.tools]
-    
+
     async def health_check(self):
         """健康检查"""
         return await self.data_source_manager.health_check_all()
-    
+
     def get_source_info(self):
         """获取数据源信息"""
         return self.data_source_manager.get_source_info()
@@ -126,11 +126,11 @@ async def quick_test():
     print("=" * 20)
 
     client = AStockTestClient()
-    
+
     # 只做健康检查
     health_status = await client.health_check()
     all_healthy = all(health_status.values())
-    
+
     if all_healthy:
         print("✅ 所有数据源正常")
     else:
@@ -138,13 +138,13 @@ async def quick_test():
         for source_name, status in health_status.items():
             if not status:
                 print(f"  - {source_name}: 异常")
-    
+
     print("测试完成！")
 
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) > 1 and sys.argv[1] == "--quick":
         asyncio.run(quick_test())
     else:

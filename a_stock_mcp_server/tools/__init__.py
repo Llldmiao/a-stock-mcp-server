@@ -13,7 +13,7 @@ from .financial_data import FinancialDataTool
 __all__ = [
     "BaseTool",
     "RealtimePriceTool",
-    "StockInfoTool", 
+    "StockInfoTool",
     "MarketSummaryTool",
     "StockHistoryTool",
     "FinancialDataTool",

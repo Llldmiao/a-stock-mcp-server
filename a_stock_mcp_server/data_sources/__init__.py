@@ -9,7 +9,7 @@ from .akshare_source import AKShareDataSource
 
 __all__ = [
     "BaseDataSource",
-    "DataSourceConfig", 
+    "DataSourceConfig",
     "DataSourceManager",
     "AKShareDataSource",
 ]
